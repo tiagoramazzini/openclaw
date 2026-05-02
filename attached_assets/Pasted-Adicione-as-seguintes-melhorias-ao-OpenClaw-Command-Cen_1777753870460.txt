@@ -1,0 +1,150 @@
+Adicione as seguintes melhorias ao OpenClaw Command Center existente (main.py, database.py, páginas HTML/JS/CSS):
+1. Chat direto (static/chat.html + chat.js)
+Nova página "💬 Chat" na sidebar entre Dashboard e Agentes.
+Interface de chat completa:
+
+Seletor de agente no topo (dropdown com agentes disponíveis)
+Seletor de modelo LLM (dropdown com modelos configurados)
+Área de mensagens com bolhas: usuário (direita, azul) e agente (esquerda, cinza escuro)
+Input de texto com Ctrl+Enter para enviar
+Streaming de resposta em tempo real (SSE ou polling a cada 500ms)
+Badge de custo por mensagem (tokens + R$) abaixo de cada resposta do agente
+Botão "Nova conversa" → limpa histórico local
+Histórico da sessão atual salvo no SQLite (chat_sessions table: id, agent_id, model, started_at, ended_at e chat_messages: id, session_id, role, content, tokens, cost_usd, timestamp)
+Botão "Ver histórico" → lista de sessões anteriores clicáveis
+
+Endpoint novo no main.py:
+
+POST /api/chat/send → proxy para /v1/chat/completions, salva mensagem e resposta no SQLite, retorna resposta + custo calculado
+GET /api/chat/sessions → lista sessões com resumo
+GET /api/chat/sessions/{id} → mensagens de uma sessão
+
+2. Editor visual de Skills (static/skills.html — expandir)
+Adicionar botão "Criar Skill" → modal com editor estruturado:
+
+Campo: Nome da skill
+Campo: Descrição (o que ela faz)
+Campo: Trigger phrases — lista de frases de exemplo que ativam a skill (chips adicionáveis)
+Editor de comandos: lista de steps com tipo (shell / API call / template) e conteúdo
+Preview do SKILL.md gerado em tempo real (painel lateral)
+Botão "Salvar" → gera arquivo SKILL.md em ~/.openclaw/skills/{nome}/SKILL.md via endpoint
+
+Endpoint novo:
+
+POST /api/skills/create → recebe estrutura, gera SKILL.md, salva no diretório de skills
+GET /api/skills/list → lista skills instaladas com status e tamanho
+DELETE /api/skills/{name} → remove skill
+
+3. Sistema de alertas (main.py + database.py + dashboard)
+Nova tabela SQLite alert_rules:
+id, type, threshold, unit, channel, active, created_at
+Tipos de alerta:
+
+agent_offline — agente offline por mais de X minutos
+cost_daily — custo diário ultrapassou R$ X
+cost_monthly — custo mensal ultrapassou R$ X
+error_repeated — mesma tool com erro mais de X vezes na última hora
+
+Background task no FastAPI (usando asyncio + lifespan):
+
+Checar alertas a cada 60 segundos
+Quando disparar: salvar em alert_events(id, rule_id, triggered_at, context_json, acknowledged)
+Notificar via: banner no dashboard (polling) + opcionalmente enviar mensagem via Telegram (se configurado)
+
+No Dashboard:
+
+Sino 🔔 no header com badge de alertas não reconhecidos
+Dropdown com alertas recentes ao clicar no sino
+Botão "Reconhecer" por alerta
+
+Na página Configurações — nova seção "Alertas":
+
+CRUD de regras de alerta via formulário visual
+Toggle ativo/inativo por regra
+Histórico de alertas disparados
+
+4. Histórico de conversas pesquisável (static/history.html + history.js)
+Nova página "📜 Histórico" na sidebar.
+Filtros no topo:
+
+Busca por palavra-chave (busca no conteúdo das mensagens)
+Filtro por agente (multiselect)
+Filtro por canal (WhatsApp / Telegram / Chat interno)
+Filtro por período (date range)
+Filtro por modelo LLM
+
+Tabela de sessões: Data | Agente | Canal | Mensagens | Tokens | Custo R$ | Duração
+
+Clique na linha → expande mensagens da sessão inline
+Botão "Exportar CSV" do período filtrado
+
+KPIs do período filtrado: total de sessões, total de mensagens, custo total, modelo mais usado
+Endpoint novo:
+
+GET /api/history → busca paginada com todos os filtros como query params
+GET /api/history/export → CSV do resultado filtrado
+
+5. Agendador de tarefas — Cron visual (static/cron.html + cron.js)
+Nova página "⏰ Agendador" na sidebar.
+Lista de tarefas agendadas: Nome | Agente | Prompt (resumido) | Frequência | Próxima execução | Status | Ações
+Botão "Nova tarefa" → modal:
+
+Nome da tarefa
+Agente (dropdown)
+Prompt que será enviado ao agente
+Frequência: botões visuais (A cada hora / Diário / Semanal / Mensal / Customizado)
+Se customizado: campos Hora, Minutos, Dias da semana (checkboxes), Dia do mês
+Preview da expressão cron gerada
+Toggle: ativo/inativo
+
+Nova tabela SQLite cron_jobs:
+id, name, agent_id, prompt, cron_expr, active, last_run, next_run, last_status, created_at
+Background task (asyncio):
+
+A cada minuto verificar jobs pendentes (next_run <= now AND active = true)
+Executar via POST /api/chat/send
+Atualizar last_run, next_run, last_status
+Salvar resultado no activity_log
+
+Endpoint novo:
+
+GET /api/cron — listar jobs
+POST /api/cron — criar job
+PATCH /api/cron/{id} — editar/pausar
+DELETE /api/cron/{id} — remover
+POST /api/cron/{id}/run — executar agora (fora do schedule)
+
+6. Multi-instância — Workspaces (main.py + database.py + todas as páginas)
+Nova tabela SQLite workspaces:
+id, name, gateway_url, gateway_token, usd_brl_rate, active, created_at
+Seletor de workspace no topo da sidebar (dropdown):
+
+"Meu OpenClaw" (padrão — usa as env vars)
+Workspaces adicionais cadastrados
+Botão "+" para adicionar novo workspace
+
+Todas as chamadas de proxy passam a incluir o workspace selecionado — buscar URL e token do banco em vez das env vars fixas.
+Modal "Adicionar Workspace":
+
+Nome (ex: "Cliente - Dr. João")
+Gateway URL
+Gateway Token (mascarado)
+Botão "Testar conexão" antes de salvar
+
+Na página Configurações — nova seção "Workspaces":
+
+Lista de todos os workspaces com status (online/offline)
+Editar / Remover
+Definir como padrão
+
+Comportamento: ao trocar de workspace, todos os dados da UI (dashboard, agentes, custos, histórico) recarregam para o workspace selecionado. Badge colorido no seletor indica status de cada workspace.
+Sidebar atualizada — ordem final:
+🏠 Dashboard | 💬 Chat | 🤖 Agentes | 📡 Canais | 🛠️ Skills | 📜 Histórico | ⏰ Agendador | 📊 Custos | ⚙️ Configurações
+Padrões obrigatórios:
+
+Nenhum token/credencial exposto no frontend
+Background tasks com asyncio no lifespan do FastAPI
+Cache de 30s nos endpoints de status/agentes
+Todos os custos em R$ com 4 casas decimais
+Responsivo mobile
+Se Gateway offline: banner vermelho fixo + sidebar desabilitada exceto Configurações e Workspaces

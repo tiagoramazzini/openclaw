@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Histórico — OpenClaw Command Center</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🦀</div>
+      <div><span>OpenClaw</span><small>Command Center</small></div>
+    </div>
+    <div style="padding:8px 12px;border-bottom:1px solid var(--border)">
+      <select id="workspace-selector" class="form-control" style="font-size:12px;padding:5px 8px"></select>
+    </div>
+    <nav class="sidebar-nav" id="sidebar-nav"></nav>
+    <div class="sidebar-footer">
+      <div class="gateway-badge">
+        <span class="status-dot" id="sidebar-status-dot"></span>
+        <span id="sidebar-status-text">Verificando…</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="gateway-banner" id="gateway-banner">
+      ⚠️ Gateway OpenClaw está offline — verifique a conexão em Configurações
+    </div>
+
+    <div class="page-header">
+      <div class="page-title">
+        <h1>Histórico</h1>
+        <p>Conversas e sessões anteriores com busca e filtros</p>
+      </div>
+      <button class="btn btn-ghost btn-sm" id="btn-export">⬇ Exportar CSV</button>
+    </div>
+
+    <div class="content">
+      <!-- KPIs -->
+      <div class="kpi-grid" style="margin-bottom:20px;grid-template-columns:repeat(auto-fit,minmax(160px,1fr))">
+        <div class="kpi-card"><div class="kpi-label">Sessões</div><div class="kpi-value" id="kpi-sessions">—</div></div>
+        <div class="kpi-card positive"><div class="kpi-label">Mensagens</div><div class="kpi-value" id="kpi-msgs">—</div></div>
+        <div class="kpi-card alert"><div class="kpi-label">Custo total</div><div class="kpi-value" style="font-size:16px" id="kpi-cost">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">Modelo top</div><div class="kpi-value" style="font-size:13px" id="kpi-model">—</div></div>
+      </div>
+
+      <!-- Filters -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:12px;flex-wrap:wrap;align-items:flex-end">
+            <div>
+              <label class="form-label">Busca por palavra-chave</label>
+              <input type="text" class="form-control" id="f-q" placeholder="Buscar no conteúdo…">
+            </div>
+            <div>
+              <label class="form-label">Agente</label>
+              <input type="text" class="form-control" id="f-agent" placeholder="ID do agente">
+            </div>
+            <div>
+              <label class="form-label">Modelo</label>
+              <select class="form-control" id="f-model">
+                <option value="">Todos</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label">De</label>
+              <input type="date" class="form-control" id="f-from">
+            </div>
+            <div>
+              <label class="form-label">Até</label>
+              <input type="date" class="form-control" id="f-to">
+            </div>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:10px">
+            <button class="btn btn-primary btn-sm" id="btn-filter">🔍 Filtrar</button>
+            <button class="btn btn-ghost btn-sm" id="btn-clear-filters">✕ Limpar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="card">
+        <div class="card-body" style="padding:0">
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Agente</th>
+                  <th>Canal</th>
+                  <th>Modelo</th>
+                  <th style="text-align:right">Msgs</th>
+                  <th style="text-align:right">Tokens</th>
+                  <th style="text-align:right">Custo R$</th>
+                  <th style="text-align:right">Duração</th>
+                </tr>
+              </thead>
+              <tbody id="history-table-body">
+                <tr><td colspan="8" style="text-align:center;color:var(--muted);padding:32px">Carregando…</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="padding:14px 16px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <span id="history-count" style="font-size:12px;color:var(--muted)"></span>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-ghost btn-sm" id="btn-prev">← Anterior</button>
+              <button class="btn btn-ghost btn-sm" id="btn-next">Próximo →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="/static/js/shared.js"></script>
+<script src="/static/js/history.js"></script>
+</body>
+</html>

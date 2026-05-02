@@ -13,6 +13,9 @@
       <div class="logo-icon">🦀</div>
       <div><span>OpenClaw</span><small>Command Center</small></div>
     </div>
+    <div style="padding:8px 12px;border-bottom:1px solid var(--border)">
+      <select id="workspace-selector" class="form-control" style="font-size:12px;padding:5px 8px"></select>
+    </div>
     <nav class="sidebar-nav" id="sidebar-nav"></nav>
     <div class="sidebar-footer">
       <div class="gateway-badge">
@@ -26,30 +29,21 @@
     <div class="gateway-banner" id="gateway-banner">
       ⚠️ Gateway OpenClaw está offline — verifique a conexão em Configurações
     </div>
-
     <div class="page-header">
-      <div class="page-title">
-        <h1>Canais</h1>
-        <p>Configuração de integrações WhatsApp e Telegram</p>
-      </div>
+      <div class="page-title"><h1>Canais</h1><p>Configuração de integrações WhatsApp e Telegram</p></div>
+      <div id="alert-bell" style="position:relative;cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:var(--card);border:1px solid var(--border)">🔔<span id="alert-bell-badge" style="position:absolute;top:-4px;right:-4px;background:var(--danger);color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;display:none;align-items:center;justify-content:center;font-weight:700"></span></div>
+      <div id="alert-dropdown" style="display:none;position:absolute;top:80px;right:20px;background:var(--card);border:1px solid var(--border);border-radius:10px;width:280px;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,0.4)"></div>
     </div>
 
     <div class="content">
-
-      <!-- WhatsApp -->
       <div class="channel-card">
         <div class="channel-header-bar">
           <div class="channel-icon">💬</div>
           <div class="channel-info">
             <div class="channel-name">WhatsApp</div>
-            <div class="channel-status-text">
-              <span class="badge" id="wa-status">—</span>
-            </div>
+            <div class="channel-status-text"><span class="badge" id="wa-status">—</span></div>
           </div>
-          <label class="toggle">
-            <input type="checkbox" id="wa-toggle">
-            <span class="toggle-slider"></span>
-          </label>
+          <label class="toggle"><input type="checkbox" id="wa-toggle"><span class="toggle-slider"></span></label>
         </div>
         <div class="channel-body">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;flex-wrap:wrap">
@@ -71,10 +65,7 @@
               <div class="form-group">
                 <label class="form-label">Regras de grupo</label>
                 <div class="toggle-wrapper" style="margin-bottom:12px">
-                  <label class="toggle">
-                    <input type="checkbox" id="wa-mention">
-                    <span class="toggle-slider"></span>
-                  </label>
+                  <label class="toggle"><input type="checkbox" id="wa-mention"><span class="toggle-slider"></span></label>
                   <span class="toggle-label">Exigir menção (@bot)</span>
                 </div>
                 <input type="text" class="form-control" id="wa-mention-pattern" placeholder="Padrão de menção (ex: @openclaw)">
@@ -88,20 +79,14 @@
         </div>
       </div>
 
-      <!-- Telegram -->
       <div class="channel-card">
         <div class="channel-header-bar">
           <div class="channel-icon">✈️</div>
           <div class="channel-info">
             <div class="channel-name">Telegram</div>
-            <div class="channel-status-text">
-              <span class="badge" id="tg-status">—</span>
-            </div>
+            <div class="channel-status-text"><span class="badge" id="tg-status">—</span></div>
           </div>
-          <label class="toggle">
-            <input type="checkbox" id="tg-toggle">
-            <span class="toggle-slider"></span>
-          </label>
+          <label class="toggle"><input type="checkbox" id="tg-toggle"><span class="toggle-slider"></span></label>
         </div>
         <div class="channel-body">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
@@ -130,15 +115,9 @@
               <div class="form-group">
                 <label class="form-label">Modo DM</label>
                 <div style="display:flex;gap:16px;margin-top:4px">
-                  <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px">
-                    <input type="radio" name="tg-dm" value="open"> Open
-                  </label>
-                  <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px">
-                    <input type="radio" name="tg-dm" value="pairing"> Pairing
-                  </label>
-                  <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px">
-                    <input type="radio" name="tg-dm" value="closed"> Closed
-                  </label>
+                  <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="radio" name="tg-dm" value="open"> Open</label>
+                  <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="radio" name="tg-dm" value="pairing"> Pairing</label>
+                  <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="radio" name="tg-dm" value="closed"> Closed</label>
                 </div>
               </div>
             </div>
@@ -149,7 +128,6 @@
           </div>
         </div>
       </div>
-
     </div>
   </main>
 </div>

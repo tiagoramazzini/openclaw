@@ -12,10 +12,10 @@
   <aside class="sidebar">
     <div class="sidebar-logo">
       <div class="logo-icon">🦀</div>
-      <div>
-        <span>OpenClaw</span>
-        <small>Command Center</small>
-      </div>
+      <div><span>OpenClaw</span><small>Command Center</small></div>
+    </div>
+    <div style="padding:8px 12px;border-bottom:1px solid var(--border)">
+      <select id="workspace-selector" class="form-control" style="font-size:12px;padding:5px 8px"></select>
     </div>
     <nav class="sidebar-nav" id="sidebar-nav"></nav>
     <div class="sidebar-footer">
@@ -36,10 +36,16 @@
         <h1>Dashboard</h1>
         <p>Visão geral do sistema OpenClaw</p>
       </div>
+      <div style="position:relative">
+        <div id="alert-bell" style="cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:var(--card);border:1px solid var(--border);font-size:18px">
+          🔔
+          <span id="alert-bell-badge" style="position:absolute;top:-4px;right:-4px;background:var(--danger);color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;display:none;align-items:center;justify-content:center;font-weight:700"></span>
+        </div>
+        <div id="alert-dropdown" style="display:none;position:absolute;top:44px;right:0;background:var(--card);border:1px solid var(--border);border-radius:10px;width:300px;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,0.4);max-height:360px;overflow-y:auto"></div>
+      </div>
     </div>
 
     <div class="content">
-      <!-- KPIs -->
       <div class="kpi-grid">
         <div class="kpi-card">
           <div class="kpi-label">Status do Gateway</div>
@@ -61,9 +67,7 @@
         </div>
       </div>
 
-      <!-- Activity + Chart -->
       <div class="grid-2" style="gap:20px">
-        <!-- Activity Feed -->
         <div class="card">
           <div class="card-header">
             <span class="card-title">Activity Feed</span>
@@ -76,7 +80,6 @@
           </div>
         </div>
 
-        <!-- Chart -->
         <div class="card">
           <div class="card-header">
             <span class="card-title">Custo por período</span>

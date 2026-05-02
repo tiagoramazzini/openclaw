@@ -5,6 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Skills — OpenClaw Command Center</title>
   <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    .skill-editor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 700px) { .skill-editor-grid { grid-template-columns: 1fr; } }
+    .step-row { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 8px; }
+    .step-type-select { width: 110px; flex-shrink: 0; }
+    .step-content { flex: 1; font-family: monospace; font-size: 12px; min-height: 60px; }
+    .skill-preview { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 14px; font-family: monospace; font-size: 12px; line-height: 1.6; white-space: pre-wrap; color: var(--text); overflow-y: auto; max-height: 380px; }
+  </style>
 </head>
 <body>
 <div class="layout">
@@ -12,6 +20,9 @@
     <div class="sidebar-logo">
       <div class="logo-icon">🦀</div>
       <div><span>OpenClaw</span><small>Command Center</small></div>
+    </div>
+    <div style="padding:8px 12px;border-bottom:1px solid var(--border)">
+      <select id="workspace-selector" class="form-control" style="font-size:12px;padding:5px 8px"></select>
     </div>
     <nav class="sidebar-nav" id="sidebar-nav"></nav>
     <div class="sidebar-footer">
@@ -26,34 +37,30 @@
     <div class="gateway-banner" id="gateway-banner">
       ⚠️ Gateway OpenClaw está offline — verifique a conexão em Configurações
     </div>
-
     <div class="page-header">
-      <div class="page-title">
-        <h1>Skills</h1>
-        <p>Capacidades e ferramentas disponíveis no Gateway</p>
+      <div class="page-title"><h1>Skills</h1><p>Capacidades e ferramentas disponíveis no Gateway</p></div>
+      <div style="display:flex;gap:8px">
+        <div id="alert-bell" style="position:relative;cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:var(--card);border:1px solid var(--border)">🔔<span id="alert-bell-badge" style="position:absolute;top:-4px;right:-4px;background:var(--danger);color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;display:none;align-items:center;justify-content:center;font-weight:700"></span></div>
+        <div id="alert-dropdown" style="display:none;position:absolute;top:80px;right:20px;background:var(--card);border:1px solid var(--border);border-radius:10px;width:280px;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,0.4)"></div>
+        <button class="btn btn-primary btn-sm" id="btn-create-skill">+ Criar Skill</button>
+        <button class="btn btn-ghost btn-sm" onclick="loadSkills()">↺ Atualizar</button>
       </div>
-      <button class="btn btn-ghost btn-sm" onclick="loadSkills()">↺ Atualizar</button>
     </div>
 
     <div class="content">
-
-      <!-- Install new skill -->
       <div class="card" style="margin-bottom:20px">
-        <div class="card-header">
-          <span class="card-title">Instalar nova skill</span>
-        </div>
+        <div class="card-header"><span class="card-title">Instalar nova skill</span></div>
         <div class="card-body">
           <div style="display:flex;gap:10px;align-items:flex-end">
             <div style="flex:1">
               <label class="form-label">URL do repositório ou nome no ClawHub</label>
-              <input type="text" class="form-control" id="install-input" placeholder="Ex: clawhub/weather-skill ou https://github.com/...">
+              <input type="text" class="form-control" id="install-input" placeholder="Ex: clawhub/weather-skill ou https://github.com/…">
             </div>
             <button class="btn btn-primary" id="install-btn">Instalar</button>
           </div>
         </div>
       </div>
 
-      <!-- Skills grid -->
       <div class="skills-grid" id="skills-grid">
         <div class="loader" style="grid-column:1/-1"><div class="spinner"></div></div>
       </div>
@@ -64,29 +71,70 @@
 <!-- Modal: Example detail -->
 <div class="modal-overlay" id="modal-example">
   <div class="modal">
-    <div class="modal-header">
-      <span class="modal-title" id="modal-example-title">Exemplo de uso</span>
-      <button class="modal-close" data-close-modal>×</button>
-    </div>
-    <div class="modal-body">
-      <pre id="modal-example-body" style="white-space:pre-wrap;font-size:13px;color:var(--text);line-height:1.6;background:var(--bg);padding:14px;border-radius:7px;border:1px solid var(--border)"></pre>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost btn-sm" data-close-modal>Fechar</button>
-    </div>
+    <div class="modal-header"><span class="modal-title" id="modal-example-title">Exemplo de uso</span><button class="modal-close" data-close-modal>×</button></div>
+    <div class="modal-body"><pre id="modal-example-body" style="white-space:pre-wrap;font-size:13px;color:var(--text);line-height:1.6;background:var(--bg);padding:14px;border-radius:7px;border:1px solid var(--border)"></pre></div>
+    <div class="modal-footer"><button class="btn btn-ghost btn-sm" data-close-modal>Fechar</button></div>
   </div>
 </div>
 
-<!-- Modal: SKILL.md -->
+<!-- Modal: SKILL.md viewer -->
 <div class="modal-overlay" id="modal-md">
   <div class="modal" style="max-width:760px">
+    <div class="modal-header"><span class="modal-title" id="modal-md-title">SKILL.md</span><button class="modal-close" data-close-modal>×</button></div>
+    <div class="modal-body" id="modal-md-body"></div>
+    <div class="modal-footer"><button class="btn btn-ghost btn-sm" data-close-modal>Fechar</button></div>
+  </div>
+</div>
+
+<!-- Modal: Create Skill -->
+<div class="modal-overlay" id="modal-create-skill">
+  <div class="modal" style="max-width:900px;max-height:92vh">
     <div class="modal-header">
-      <span class="modal-title" id="modal-md-title">SKILL.md</span>
+      <span class="modal-title">Criar nova Skill</span>
       <button class="modal-close" data-close-modal>×</button>
     </div>
-    <div class="modal-body" id="modal-md-body"></div>
+    <div class="modal-body">
+      <div class="skill-editor-grid">
+        <!-- Left: form -->
+        <div>
+          <div class="form-group">
+            <label class="form-label">Nome da skill</label>
+            <input type="text" class="form-control" id="sk-name" placeholder="Ex: weather_checker" oninput="updateSkillPreview()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Descrição</label>
+            <textarea class="form-control" id="sk-desc" rows="2" placeholder="O que esta skill faz…" oninput="updateSkillPreview()"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Trigger phrases</label>
+            <div class="chips" id="sk-trigger-chips"></div>
+            <div style="display:flex;gap:8px">
+              <input type="text" class="form-control" id="sk-trigger-input" placeholder="Ex: Qual o clima hoje?" style="flex:1">
+              <button class="btn btn-ghost btn-sm" id="sk-trigger-add">+ Adicionar</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Comandos / Steps</label>
+            <div id="sk-steps-list"></div>
+            <button class="btn btn-ghost btn-sm" id="sk-add-step" style="margin-top:6px">+ Adicionar step</button>
+          </div>
+        </div>
+        <!-- Right: preview -->
+        <div>
+          <label class="form-label">Preview do SKILL.md</label>
+          <div class="skill-preview" id="skill-md-preview"># skill_name
+
+## Descrição
+…
+
+## Trigger phrases
+- …</div>
+        </div>
+      </div>
+    </div>
     <div class="modal-footer">
-      <button class="btn btn-ghost btn-sm" data-close-modal>Fechar</button>
+      <button class="btn btn-ghost btn-sm" data-close-modal>Cancelar</button>
+      <button class="btn btn-primary btn-sm" id="btn-save-skill">Salvar Skill</button>
     </div>
   </div>
 </div>

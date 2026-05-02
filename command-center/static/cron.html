@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agendador — OpenClaw Command Center</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🦀</div>
+      <div><span>OpenClaw</span><small>Command Center</small></div>
+    </div>
+    <div style="padding:8px 12px;border-bottom:1px solid var(--border)">
+      <select id="workspace-selector" class="form-control" style="font-size:12px;padding:5px 8px"></select>
+    </div>
+    <nav class="sidebar-nav" id="sidebar-nav"></nav>
+    <div class="sidebar-footer">
+      <div class="gateway-badge">
+        <span class="status-dot" id="sidebar-status-dot"></span>
+        <span id="sidebar-status-text">Verificando…</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="gateway-banner" id="gateway-banner">
+      ⚠️ Gateway OpenClaw está offline — verifique a conexão em Configurações
+    </div>
+
+    <div class="page-header">
+      <div class="page-title">
+        <h1>Agendador</h1>
+        <p>Tarefas automáticas periódicas para os agentes</p>
+      </div>
+      <button class="btn btn-primary btn-sm" id="btn-new-job">+ Nova tarefa</button>
+    </div>
+
+    <div class="content">
+      <div class="card">
+        <div class="card-body" style="padding:0">
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Agente</th>
+                  <th>Prompt</th>
+                  <th>Frequência</th>
+                  <th>Próxima execução</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="cron-table-body">
+                <tr><td colspan="7" style="text-align:center;color:var(--muted);padding:32px">Carregando…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal: New/Edit job -->
+<div class="modal-overlay" id="modal-job">
+  <div class="modal" style="max-width:580px">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-job-title">Nova tarefa agendada</span>
+      <button class="modal-close" data-close-modal>×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="job-id">
+      <div class="form-group">
+        <label class="form-label">Nome da tarefa</label>
+        <input type="text" class="form-control" id="job-name" placeholder="Ex: Relatório diário">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Agente (ID)</label>
+        <input type="text" class="form-control" id="job-agent" placeholder="ID do agente (opcional)">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Prompt</label>
+        <textarea class="form-control" id="job-prompt" rows="3" placeholder="Mensagem que será enviada ao agente…"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Frequência</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px" id="freq-btns">
+          <button class="btn btn-ghost btn-sm freq-btn" data-expr="hourly">A cada hora</button>
+          <button class="btn btn-ghost btn-sm freq-btn" data-expr="daily">Diário</button>
+          <button class="btn btn-ghost btn-sm freq-btn" data-expr="weekly">Semanal</button>
+          <button class="btn btn-ghost btn-sm freq-btn" data-expr="monthly">Mensal</button>
+          <button class="btn btn-ghost btn-sm freq-btn" data-expr="custom">Customizado</button>
+        </div>
+        <div id="custom-cron-section" style="display:none">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px">
+            <div>
+              <label class="form-label">Hora (0-23)</label>
+              <input type="number" class="form-control" id="cron-hour" min="0" max="23" value="9">
+            </div>
+            <div>
+              <label class="form-label">Minuto (0-59)</label>
+              <input type="number" class="form-control" id="cron-min" min="0" max="59" value="0">
+            </div>
+          </div>
+          <label class="form-label">Dias da semana</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+            <label style="font-size:12px;display:flex;align-items:center;gap:4px" title="Segunda"><input type="checkbox" class="cron-dow" value="1"> Seg</label>
+            <label style="font-size:12px;display:flex;align-items:center;gap:4px" title="Terça"><input type="checkbox" class="cron-dow" value="2"> Ter</label>
+            <label style="font-size:12px;display:flex;align-items:center;gap:4px" title="Quarta"><input type="checkbox" class="cron-dow" value="3"> Qua</label>
+            <label style="font-size:12px;display:flex;align-items:center;gap:4px" title="Quinta"><input type="checkbox" class="cron-dow" value="4"> Qui</label>
+            <label style="font-size:12px;display:flex;align-items:center;gap:4px" title="Sexta"><input type="checkbox" class="cron-dow" value="5"> Sex</label>
+            <label style="font-size:12px;display:flex;align-items:center;gap:4px" title="Sábado"><input type="checkbox" class="cron-dow" value="6"> Sáb</label>
+            <label style="font-size:12px;display:flex;align-items:center;gap:4px" title="Domingo"><input type="checkbox" class="cron-dow" value="0"> Dom</label>
+          </div>
+        </div>
+        <div style="background:var(--bg);border-radius:6px;padding:8px 12px;font-size:12px;color:var(--primary);font-family:monospace">
+          Expressão: <strong id="cron-preview">daily</strong>
+        </div>
+      </div>
+      <div class="toggle-wrapper">
+        <label class="toggle"><input type="checkbox" id="job-active" checked><span class="toggle-slider"></span></label>
+        <span class="toggle-label">Ativa</span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-sm" data-close-modal>Cancelar</button>
+      <button class="btn btn-primary btn-sm" id="btn-save-job">Salvar tarefa</button>
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/shared.js"></script>
+<script src="/static/js/cron.js"></script>
+</body>
+</html>

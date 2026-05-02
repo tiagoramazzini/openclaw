@@ -14,6 +14,9 @@
       <div class="logo-icon">🦀</div>
       <div><span>OpenClaw</span><small>Command Center</small></div>
     </div>
+    <div style="padding:8px 12px;border-bottom:1px solid var(--border)">
+      <select id="workspace-selector" class="form-control" style="font-size:12px;padding:5px 8px"></select>
+    </div>
     <nav class="sidebar-nav" id="sidebar-nav"></nav>
     <div class="sidebar-footer">
       <div class="gateway-badge">
@@ -27,119 +30,54 @@
     <div class="gateway-banner" id="gateway-banner">
       ⚠️ Gateway OpenClaw está offline — verifique a conexão em Configurações
     </div>
-
     <div class="page-header">
-      <div class="page-title">
-        <h1>Custos</h1>
-        <p>Análise de consumo e gastos por modelo e canal</p>
-      </div>
-      <div style="display:flex;gap:8px">
-        <button class="btn btn-primary btn-sm period-btn" data-period="today">Hoje</button>
+      <div class="page-title"><h1>Custos</h1><p>Análise de consumo e gastos por modelo e canal</p></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div id="alert-bell" style="position:relative;cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:var(--card);border:1px solid var(--border)">🔔<span id="alert-bell-badge" style="position:absolute;top:-4px;right:-4px;background:var(--danger);color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;display:none;align-items:center;justify-content:center;font-weight:700"></span></div>
+        <div id="alert-dropdown" style="display:none;position:absolute;top:80px;right:20px;background:var(--card);border:1px solid var(--border);border-radius:10px;width:280px;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,0.4)"></div>
+        <button class="btn btn-primary btn-sm period-btn active" data-period="today">Hoje</button>
         <button class="btn btn-ghost btn-sm period-btn" data-period="week">7 dias</button>
         <button class="btn btn-ghost btn-sm period-btn" data-period="month">Mês</button>
       </div>
     </div>
-
     <div class="content">
-
-      <!-- KPIs -->
       <div class="kpi-grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr))">
-        <div class="kpi-card alert">
-          <div class="kpi-label">Custo hoje</div>
-          <div class="kpi-value" style="font-size:18px" id="kpi-today">—</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">Custo este mês</div>
-          <div class="kpi-value" style="font-size:18px" id="kpi-month">—</div>
-        </div>
-        <div class="kpi-card positive">
-          <div class="kpi-label">Projeção do mês</div>
-          <div class="kpi-value" style="font-size:18px" id="kpi-projection">—</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">Modelo mais usado</div>
-          <div class="kpi-value" style="font-size:14px;word-break:break-all" id="kpi-top-model">—</div>
-        </div>
+        <div class="kpi-card alert"><div class="kpi-label">Custo hoje</div><div class="kpi-value" style="font-size:18px" id="kpi-today">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">Custo este mês</div><div class="kpi-value" style="font-size:18px" id="kpi-month">—</div></div>
+        <div class="kpi-card positive"><div class="kpi-label">Projeção do mês</div><div class="kpi-value" style="font-size:18px" id="kpi-projection">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">Modelo mais usado</div><div class="kpi-value" style="font-size:14px;word-break:break-all" id="kpi-top-model">—</div></div>
       </div>
 
-      <!-- Charts -->
       <div class="card" style="margin-bottom:20px">
-        <div class="card-header">
-          <span class="card-title">Custo diário (R$)</span>
-        </div>
-        <div class="card-body">
-          <div class="chart-container" style="height:240px">
-            <canvas id="chart-line"></canvas>
-          </div>
-        </div>
+        <div class="card-header"><span class="card-title">Custo diário (R$)</span></div>
+        <div class="card-body"><div class="chart-container" style="height:240px"><canvas id="chart-line"></canvas></div></div>
       </div>
 
       <div class="grid-2" style="margin-bottom:20px">
-        <div class="card">
-          <div class="card-header"><span class="card-title">Por modelo</span></div>
-          <div class="card-body">
-            <div class="chart-container" style="height:220px">
-              <canvas id="chart-model"></canvas>
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-header"><span class="card-title">Por canal</span></div>
-          <div class="card-body">
-            <div class="chart-container" style="height:220px">
-              <canvas id="chart-channel"></canvas>
-            </div>
-          </div>
-        </div>
+        <div class="card"><div class="card-header"><span class="card-title">Por modelo</span></div><div class="card-body"><div class="chart-container" style="height:220px"><canvas id="chart-model"></canvas></div></div></div>
+        <div class="card"><div class="card-header"><span class="card-title">Por canal</span></div><div class="card-body"><div class="chart-container" style="height:220px"><canvas id="chart-channel"></canvas></div></div></div>
       </div>
 
-      <!-- Estimator -->
       <div class="card" style="margin-bottom:20px">
-        <div class="card-header">
-          <span class="card-title">Calculadora de estimativa</span>
-        </div>
+        <div class="card-header"><span class="card-title">Calculadora de estimativa</span></div>
         <div class="card-body">
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:14px;align-items:flex-end;flex-wrap:wrap">
-            <div>
-              <label class="form-label">Modelo</label>
-              <select class="form-control" id="est-model"></select>
-            </div>
-            <div>
-              <label class="form-label">Tokens de entrada</label>
-              <input type="number" class="form-control" id="est-input" value="1000" min="0">
-            </div>
-            <div>
-              <label class="form-label">Tokens de saída</label>
-              <input type="number" class="form-control" id="est-output" value="500" min="0">
-            </div>
+            <div><label class="form-label">Modelo</label><select class="form-control" id="est-model"></select></div>
+            <div><label class="form-label">Tokens de entrada</label><input type="number" class="form-control" id="est-input" value="1000" min="0"></div>
+            <div><label class="form-label">Tokens de saída</label><input type="number" class="form-control" id="est-output" value="500" min="0"></div>
             <button class="btn btn-primary" id="btn-estimate" style="height:38px">Calcular</button>
           </div>
           <div id="est-result"></div>
         </div>
       </div>
 
-      <!-- Table -->
       <div class="card">
-        <div class="card-header">
-          <span class="card-title">Detalhamento</span>
-        </div>
+        <div class="card-header"><span class="card-title">Detalhamento</span></div>
         <div class="card-body" style="padding:0">
           <div class="table-wrapper">
             <table>
-              <thead>
-                <tr>
-                  <th>Data</th>
-                  <th>Agente</th>
-                  <th>Modelo</th>
-                  <th>Canal</th>
-                  <th style="text-align:right">Tokens entrada</th>
-                  <th style="text-align:right">Tokens saída</th>
-                  <th style="text-align:right">Custo R$</th>
-                </tr>
-              </thead>
-              <tbody id="costs-table-body">
-                <tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px">Carregando…</td></tr>
-              </tbody>
+              <thead><tr><th>Data</th><th>Agente</th><th>Modelo</th><th>Canal</th><th style="text-align:right">Tokens entrada</th><th style="text-align:right">Tokens saída</th><th style="text-align:right">Custo R$</th></tr></thead>
+              <tbody id="costs-table-body"><tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px">Carregando…</td></tr></tbody>
             </table>
           </div>
         </div>

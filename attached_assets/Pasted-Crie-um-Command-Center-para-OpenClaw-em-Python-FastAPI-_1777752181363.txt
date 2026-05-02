@@ -1,0 +1,196 @@
+Crie um Command Center para OpenClaw em Python + FastAPI (backend) + HTML/CSS/JS vanilla (frontend). É uma UI administrativa que faz proxy para a API do OpenClaw rodando localmente na porta 18789. Arquivo único por página. Dark theme.
+Identidade visual:
+
+Background: #0e1117
+Cards: #1a1d27
+Acento primário: #00b4d8 (azul)
+Positivo: #00c853 (verde)
+Alerta: #f77f00 (laranja)
+Perigo: #d62828 (vermelho)
+Fonte: Inter (Google Fonts)
+
+Estrutura de arquivos:
+command-center/
+  main.py              ← FastAPI backend + proxy OpenClaw
+  database.py          ← SQLite para persistir custo/histórico
+  static/
+    dashboard.html
+    agents.html
+    channels.html
+    skills.html
+    costs.html
+    settings.html
+    js/
+      dashboard.js
+      agents.js
+      channels.js
+      skills.js
+      costs.js
+      settings.js
+      shared.js        ← sidebar, alerts, fetch wrapper
+    css/
+      style.css
+  requirements.txt
+  docker-compose.yml
+Configuração via variáveis de ambiente:
+OPENCLAW_URL=http://127.0.0.1:18789
+OPENCLAW_TOKEN=your-gateway-token
+CC_PORT=8090
+CC_PASSWORD=admin123
+Schema SQLite — tabela token_usage:
+id, timestamp, agent_id, model, input_tokens, output_tokens,
+cost_usd, channel, session_id
+Tabela activity_log:
+id, timestamp, agent_id, channel, event_type, summary, raw_json
+main.py — endpoints FastAPI:
+Proxy transparente para OpenClaw:
+
+GET /api/openclaw/status → proxy GET {OPENCLAW_URL}/
+GET /api/openclaw/sessions → proxy GET {OPENCLAW_URL}/sessions
+POST /api/openclaw/message → proxy POST {OPENCLAW_URL}/v1/chat/completions
+GET /api/openclaw/skills → proxy GET {OPENCLAW_URL}/skills
+POST /api/openclaw/tools → proxy POST {OPENCLAW_URL}/tools/invoke
+
+Endpoints próprios do Command Center:
+
+GET /api/dashboard → status geral: agentes ativos, mensagens hoje, custo hoje, últimas 10 atividades
+GET /api/costs → breakdown de custo por agente/modelo/período (do SQLite)
+GET /api/activity → histórico de atividades paginado
+POST /api/activity → salvar evento de atividade
+GET /api/config → ler ~/.openclaw/openclaw.json e retornar como objeto (mascarar tokens)
+PATCH /api/config → escrever seções específicas do config sem sobrescrever o arquivo todo
+GET /api/costs/estimate → dado model + tokens estimados, retornar custo em USD e BRL
+
+Tabela de preços por modelo (configurável, valores padrão em R$):
+pythonMODEL_PRICES = {
+    "claude-sonnet-4-6": {"input": 3.00, "output": 15.00},  # por 1M tokens
+    "claude-opus-4-6": {"input": 15.00, "output": 75.00},
+    "gpt-4o": {"input": 2.50, "output": 10.00},
+    "gpt-4o-mini": {"input": 0.15, "output": 0.60},
+    "gemini-2.0-flash": {"input": 0.10, "output": 0.40},
+}
+Converter USD→BRL usando taxa configurável (default 5.70, editável nas settings).
+static/dashboard.html — Dashboard:
+Layout: sidebar fixa esquerda + conteúdo principal.
+Sidebar com links: 🏠 Dashboard | 🤖 Agentes | 📡 Canais | 🛠️ Skills | 📊 Custos | ⚙️ Configurações
+KPI cards (4 em linha):
+
+Status do Gateway (verde "Online" / vermelho "Offline")
+Mensagens hoje
+Custo hoje em R$
+Agentes ativos
+
+Activity Feed em tempo real (polling a cada 5s via GET /api/activity):
+Cards de eventos com ícone por tipo:
+
+📨 Mensagem recebida — canal, remetente mascarado, preview
+🔍 Ferramenta invocada — nome da tool, parâmetros resumidos
+✅ Resposta enviada — tokens usados, custo estimado, tempo de resposta
+❌ Erro — tipo, mensagem resumida
+
+Cada card: timestamp relativo ("há 2 min"), agente, canal, badge de custo em R$
+Seção "Resumo do dia": gráfico de barras por hora (Chart.js) com mensagens e custo
+static/agents.html — Agentes:
+Grid de cards por agente (buscar de /api/openclaw/sessions):
+
+Nome/ID do agente
+Modelo LLM em uso
+Canal principal
+Status: Online (verde) / Idle (amarelo) / Offline (cinza)
+Última atividade: timestamp relativo
+Total de mensagens hoje
+Custo acumulado hoje em R$
+Botões: Ver Logs | Pausar | Reiniciar
+
+Modal "Ver Logs": histórico de mensagens da sessão, paginado, com timestamps e custo por mensagem
+static/channels.html — Canais:
+Sem JSON — formulários visuais para configurar cada canal.
+Card por canal suportado (WhatsApp, Telegram):
+
+Toggle ativo/inativo
+Status de conexão (conectado / desconectado / erro)
+Campos específicos por canal:
+
+WhatsApp:
+
+Número de telefone vinculado
+Lista de remetentes permitidos (allowFrom) — input com chips adicionáveis
+Regras de grupo: requireMention toggle + padrão de menção
+
+Telegram:
+
+Bot token (mascarado, botão "revelar")
+Username do bot
+Lista de chat IDs permitidos — chips adicionáveis
+Modo DM: Open / Pairing / Closed (radio buttons)
+
+Botão "Salvar" por canal → PATCH /api/config com a seção do canal
+Botão "Testar conexão" → envia mensagem de teste via POST /api/openclaw/tools
+static/skills.html — Skills:
+Grid de cards por skill (buscar de /api/openclaw/skills):
+
+Nome e descrição
+Categoria badge (Sistema / Instalada / Disponível)
+Toggle ativo/inativo
+Exemplos de uso (3 frases de exemplo clicáveis — clicou, abre modal com detalhes)
+Botão "Ver SKILL.md" → modal com conteúdo da skill
+
+Seção "Instalar nova skill":
+
+Input de URL do repositório ou nome do ClawHub
+Botão instalar → POST /api/openclaw/tools com clawhub install
+
+static/costs.html — Custos:
+KPIs: Custo hoje | Custo este mês | Projeção do mês | Modelo mais usado
+Gráfico de linha: custo por dia (últimos 30 dias) — Chart.js
+Donut: distribuição por modelo
+Donut: distribuição por canal (WhatsApp vs Telegram)
+Tabela detalhada: Data | Agente | Modelo | Canal | Tokens entrada | Tokens saída | Custo R$
+Alerta configurável: "Me avisar se custo diário ultrapassar R$ ___"
+Calculadora de estimativa: selecionar modelo + estimar tokens → mostrar custo em R$
+static/settings.html — Configurações:
+Seção "Gateway OpenClaw":
+
+URL do gateway (default http://127.0.0.1:18789)
+Gateway token (mascarado)
+Botão "Testar conexão"
+
+Seção "Modelos e Custos":
+
+Taxa de câmbio USD→BRL (editável)
+Tabela editável de preços por modelo (input/output por 1M tokens)
+Modelo padrão (dropdown)
+
+Seção "Command Center":
+
+Senha de acesso (alterar)
+Porta do servidor
+Idioma: Português / English
+
+Seção "Config Raw" (colapsável, modo avançado):
+
+Editor JSON do openclaw.json com syntax highlight simples
+Botão "Salvar config" com confirmação
+
+requirements.txt: fastapi, uvicorn, sqlalchemy, httpx, aiofiles, python-multipart
+docker-compose.yml:
+yamlservices:
+  command-center:
+    build: .
+    ports:
+      - "8090:8090"
+    volumes:
+      - ~/.openclaw:/root/.openclaw:ro  # leitura do config
+    environment:
+      - OPENCLAW_URL=http://host.docker.internal:18789
+      - OPENCLAW_TOKEN=${OPENCLAW_TOKEN}
+      - CC_PASSWORD=${CC_PASSWORD:-admin123}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+Notas importantes:
+
+O Command Center nunca expõe o OPENCLAW_TOKEN para o frontend — toda chamada passa pelo backend FastAPI
+Leitura do openclaw.json é somente leitura por padrão — escrita requer confirmação explícita
+Se o Gateway estiver offline, mostrar banner vermelho fixo no topo de todas as páginas
+Polling do activity feed a cada 5s — parar polling se aba estiver em background (Page Visibility API)
+Todos os custos em R$ com 4 casas decimais (ex: R$ 0,0023) para não perder precisão em valores pequenos

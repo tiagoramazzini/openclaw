@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — OpenClaw Command Center</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🦀</div>
+      <div>
+        <span>OpenClaw</span>
+        <small>Command Center</small>
+      </div>
+    </div>
+    <nav class="sidebar-nav" id="sidebar-nav"></nav>
+    <div class="sidebar-footer">
+      <div class="gateway-badge">
+        <span class="status-dot" id="sidebar-status-dot"></span>
+        <span id="sidebar-status-text">Verificando…</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="gateway-banner" id="gateway-banner">
+      ⚠️ Gateway OpenClaw está offline — verifique a conexão em Configurações
+    </div>
+
+    <div class="page-header">
+      <div class="page-title">
+        <h1>Dashboard</h1>
+        <p>Visão geral do sistema OpenClaw</p>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- KPIs -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Status do Gateway</div>
+          <div class="kpi-value" id="kpi-gateway" style="font-size:18px;margin-top:4px">
+            <div class="spinner" style="width:20px;height:20px;border-width:2px"></div>
+          </div>
+        </div>
+        <div class="kpi-card positive">
+          <div class="kpi-label">Mensagens hoje</div>
+          <div class="kpi-value" id="kpi-messages">—</div>
+        </div>
+        <div class="kpi-card alert">
+          <div class="kpi-label">Custo hoje</div>
+          <div class="kpi-value" style="font-size:20px" id="kpi-cost">—</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Agentes ativos</div>
+          <div class="kpi-value" id="kpi-agents">—</div>
+        </div>
+      </div>
+
+      <!-- Activity + Chart -->
+      <div class="grid-2" style="gap:20px">
+        <!-- Activity Feed -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Activity Feed</span>
+            <span class="badge badge-primary" style="font-size:10px">Ao vivo · 5s</span>
+          </div>
+          <div class="card-body" style="padding:14px">
+            <div class="activity-list" id="activity-feed">
+              <div class="loader"><div class="spinner"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Custo por período</span>
+          </div>
+          <div class="card-body">
+            <div class="chart-container" style="height:300px">
+              <canvas id="chart-hourly"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="/static/js/shared.js"></script>
+<script src="/static/js/dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+services:
+  command-center:
+    build: .
+    ports:
+      - "8090:8090"
+    volumes:
+      - ~/.openclaw:/root/.openclaw:ro
+    environment:
+      - OPENCLAW_URL=http://host.docker.internal:18789
+      - OPENCLAW_TOKEN=${OPENCLAW_TOKEN}
+      - CC_PASSWORD=${CC_PASSWORD:-admin123}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

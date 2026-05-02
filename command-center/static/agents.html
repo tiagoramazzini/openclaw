@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agentes — OpenClaw Command Center</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🦀</div>
+      <div><span>OpenClaw</span><small>Command Center</small></div>
+    </div>
+    <nav class="sidebar-nav" id="sidebar-nav"></nav>
+    <div class="sidebar-footer">
+      <div class="gateway-badge">
+        <span class="status-dot" id="sidebar-status-dot"></span>
+        <span id="sidebar-status-text">Verificando…</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="gateway-banner" id="gateway-banner">
+      ⚠️ Gateway OpenClaw está offline — verifique a conexão em Configurações
+    </div>
+
+    <div class="page-header">
+      <div class="page-title">
+        <h1>Agentes</h1>
+        <p>Sessões ativas no Gateway OpenClaw</p>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="loadAgents()">↺ Atualizar</button>
+    </div>
+
+    <div class="content">
+      <div class="agents-grid" id="agents-grid">
+        <div class="loader" style="grid-column:1/-1"><div class="spinner"></div></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal Logs -->
+<div class="modal-overlay" id="modal-logs">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-logs-title">Logs do Agente</span>
+      <button class="modal-close" data-close-modal>×</button>
+    </div>
+    <div class="modal-body" id="modal-logs-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-sm" data-close-modal>Fechar</button>
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/shared.js"></script>
+<script src="/static/js/agents.js"></script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skills — OpenClaw Command Center</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🦀</div>
+      <div><span>OpenClaw</span><small>Command Center</small></div>
+    </div>
+    <nav class="sidebar-nav" id="sidebar-nav"></nav>
+    <div class="sidebar-footer">
+      <div class="gateway-badge">
+        <span class="status-dot" id="sidebar-status-dot"></span>
+        <span id="sidebar-status-text">Verificando…</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="gateway-banner" id="gateway-banner">
+      ⚠️ Gateway OpenClaw está offline — verifique a conexão em Configurações
+    </div>
+
+    <div class="page-header">
+      <div class="page-title">
+        <h1>Skills</h1>
+        <p>Capacidades e ferramentas disponíveis no Gateway</p>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="loadSkills()">↺ Atualizar</button>
+    </div>
+
+    <div class="content">
+
+      <!-- Install new skill -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header">
+          <span class="card-title">Instalar nova skill</span>
+        </div>
+        <div class="card-body">
+          <div style="display:flex;gap:10px;align-items:flex-end">
+            <div style="flex:1">
+              <label class="form-label">URL do repositório ou nome no ClawHub</label>
+              <input type="text" class="form-control" id="install-input" placeholder="Ex: clawhub/weather-skill ou https://github.com/...">
+            </div>
+            <button class="btn btn-primary" id="install-btn">Instalar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Skills grid -->
+      <div class="skills-grid" id="skills-grid">
+        <div class="loader" style="grid-column:1/-1"><div class="spinner"></div></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal: Example detail -->
+<div class="modal-overlay" id="modal-example">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-example-title">Exemplo de uso</span>
+      <button class="modal-close" data-close-modal>×</button>
+    </div>
+    <div class="modal-body">
+      <pre id="modal-example-body" style="white-space:pre-wrap;font-size:13px;color:var(--text);line-height:1.6;background:var(--bg);padding:14px;border-radius:7px;border:1px solid var(--border)"></pre>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-sm" data-close-modal>Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: SKILL.md -->
+<div class="modal-overlay" id="modal-md">
+  <div class="modal" style="max-width:760px">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-md-title">SKILL.md</span>
+      <button class="modal-close" data-close-modal>×</button>
+    </div>
+    <div class="modal-body" id="modal-md-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-sm" data-close-modal>Fechar</button>
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/shared.js"></script>
+<script src="/static/js/skills.js"></script>
+</body>
+</html>

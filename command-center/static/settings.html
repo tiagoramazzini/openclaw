@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configurações — OpenClaw Command Center</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🦀</div>
+      <div><span>OpenClaw</span><small>Command Center</small></div>
+    </div>
+    <nav class="sidebar-nav" id="sidebar-nav"></nav>
+    <div class="sidebar-footer">
+      <div class="gateway-badge">
+        <span class="status-dot" id="sidebar-status-dot"></span>
+        <span id="sidebar-status-text">Verificando…</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="gateway-banner" id="gateway-banner">
+      ⚠️ Gateway OpenClaw está offline — verifique a conexão em Configurações
+    </div>
+
+    <div class="page-header">
+      <div class="page-title">
+        <h1>Configurações</h1>
+        <p>Parâmetros do Gateway e do Command Center</p>
+      </div>
+    </div>
+
+    <div class="content" style="max-width:820px">
+
+      <!-- Gateway section -->
+      <div class="card settings-section" style="margin-bottom:20px">
+        <div class="card-header">
+          <span class="card-title">🔌 Gateway OpenClaw</span>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label class="form-label">URL do Gateway</label>
+            <input type="text" class="form-control" id="s-gateway-url" placeholder="http://127.0.0.1:18789">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Gateway Token</label>
+            <div class="masked-input-wrapper">
+              <input type="password" class="form-control" id="s-gateway-token" placeholder="seu-token-aqui">
+              <button class="reveal-btn" id="s-reveal-token">👁️</button>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px">
+            <button class="btn btn-primary btn-sm" id="btn-save-gateway">Salvar</button>
+            <button class="btn btn-ghost btn-sm" id="btn-test-gateway">Testar conexão</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Models & Costs section -->
+      <div class="card settings-section" style="margin-bottom:20px">
+        <div class="card-header">
+          <span class="card-title">💰 Modelos e Custos</span>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label class="form-label">Taxa de câmbio USD → BRL</label>
+            <input type="number" step="0.01" class="form-control" id="s-usd-brl" style="max-width:160px" placeholder="5.70">
+          </div>
+
+          <label class="form-label" style="margin-bottom:8px">Preços por modelo (por 1M tokens)</label>
+          <div class="table-wrapper" style="margin-bottom:14px">
+            <table>
+              <thead>
+                <tr>
+                  <th>Modelo</th>
+                  <th>Entrada (USD)</th>
+                  <th>Saída (USD)</th>
+                </tr>
+              </thead>
+              <tbody id="prices-table-body"></tbody>
+            </table>
+          </div>
+          <button class="btn btn-primary btn-sm" id="btn-save-models">Salvar preços</button>
+        </div>
+      </div>
+
+      <!-- Command Center section -->
+      <div class="card settings-section" style="margin-bottom:20px">
+        <div class="card-header">
+          <span class="card-title">⚙️ Command Center</span>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label class="form-label">Porta do servidor</label>
+            <input type="number" class="form-control" id="s-cc-port" style="max-width:160px" placeholder="8090">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Idioma</label>
+            <select class="form-control" style="max-width:200px">
+              <option value="pt-BR" selected>Português</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+          <button class="btn btn-primary btn-sm" id="btn-save-cc">Salvar</button>
+        </div>
+      </div>
+
+      <!-- Raw Config (collapsible) -->
+      <div class="card settings-section">
+        <div class="card-header" style="cursor:pointer" id="btn-toggle-raw">
+          <span class="card-title">🔧 Config Raw (modo avançado)</span>
+          <span style="color:var(--muted);font-size:12px">Clique para expandir ▼</span>
+        </div>
+        <div id="raw-config-section" class="collapse-content">
+          <div class="card-body">
+            <p style="color:var(--muted);font-size:12px;margin-bottom:12px">
+              Editor direto do <code style="background:var(--bg);padding:2px 6px;border-radius:4px;color:var(--primary)">openclaw.json</code>. Edite com cuidado — tokens ficam mascarados e não serão sobrescritos.
+            </p>
+            <textarea class="form-control" id="raw-config" style="font-family:monospace;font-size:12px;min-height:280px;line-height:1.6"></textarea>
+            <div style="margin-top:12px">
+              <button class="btn btn-danger btn-sm" id="btn-save-raw">Salvar configuração</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="/static/js/shared.js"></script>
+<script src="/static/js/settings.js"></script>
+</body>
+</html>

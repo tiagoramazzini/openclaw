@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Canais — OpenClaw Command Center</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🦀</div>
+      <div><span>OpenClaw</span><small>Command Center</small></div>
+    </div>
+    <nav class="sidebar-nav" id="sidebar-nav"></nav>
+    <div class="sidebar-footer">
+      <div class="gateway-badge">
+        <span class="status-dot" id="sidebar-status-dot"></span>
+        <span id="sidebar-status-text">Verificando…</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="gateway-banner" id="gateway-banner">
+      ⚠️ Gateway OpenClaw está offline — verifique a conexão em Configurações
+    </div>
+
+    <div class="page-header">
+      <div class="page-title">
+        <h1>Canais</h1>
+        <p>Configuração de integrações WhatsApp e Telegram</p>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- WhatsApp -->
+      <div class="channel-card">
+        <div class="channel-header-bar">
+          <div class="channel-icon">💬</div>
+          <div class="channel-info">
+            <div class="channel-name">WhatsApp</div>
+            <div class="channel-status-text">
+              <span class="badge" id="wa-status">—</span>
+            </div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="wa-toggle">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="channel-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;flex-wrap:wrap">
+            <div>
+              <div class="form-group">
+                <label class="form-label">Número de telefone vinculado</label>
+                <input type="text" class="form-control" id="wa-phone" placeholder="+55 11 99999-9999">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Remetentes permitidos (allowFrom)</label>
+                <div class="chips" id="wa-chips"></div>
+                <div style="display:flex;gap:8px">
+                  <input type="text" class="form-control" id="wa-chip-input" placeholder="Ex: +5511999..." style="flex:1">
+                  <button class="btn btn-ghost btn-sm" id="wa-chip-add">+ Adicionar</button>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="form-group">
+                <label class="form-label">Regras de grupo</label>
+                <div class="toggle-wrapper" style="margin-bottom:12px">
+                  <label class="toggle">
+                    <input type="checkbox" id="wa-mention">
+                    <span class="toggle-slider"></span>
+                  </label>
+                  <span class="toggle-label">Exigir menção (@bot)</span>
+                </div>
+                <input type="text" class="form-control" id="wa-mention-pattern" placeholder="Padrão de menção (ex: @openclaw)">
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap">
+            <button class="btn btn-primary btn-sm" id="wa-save-btn">Salvar WhatsApp</button>
+            <button class="btn btn-ghost btn-sm" id="wa-test-btn">Testar conexão</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Telegram -->
+      <div class="channel-card">
+        <div class="channel-header-bar">
+          <div class="channel-icon">✈️</div>
+          <div class="channel-info">
+            <div class="channel-name">Telegram</div>
+            <div class="channel-status-text">
+              <span class="badge" id="tg-status">—</span>
+            </div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="tg-toggle">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="channel-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+            <div>
+              <div class="form-group">
+                <label class="form-label">Bot Token</label>
+                <div class="masked-input-wrapper">
+                  <input type="password" class="form-control" id="tg-token" placeholder="123456:ABC-DEF…">
+                  <button class="reveal-btn" id="tg-reveal-btn">👁️</button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Username do bot</label>
+                <input type="text" class="form-control" id="tg-username" placeholder="@meubot">
+              </div>
+            </div>
+            <div>
+              <div class="form-group">
+                <label class="form-label">Chat IDs permitidos</label>
+                <div class="chips" id="tg-chips"></div>
+                <div style="display:flex;gap:8px">
+                  <input type="text" class="form-control" id="tg-chip-input" placeholder="Ex: -100123456" style="flex:1">
+                  <button class="btn btn-ghost btn-sm" id="tg-chip-add">+ Adicionar</button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Modo DM</label>
+                <div style="display:flex;gap:16px;margin-top:4px">
+                  <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px">
+                    <input type="radio" name="tg-dm" value="open"> Open
+                  </label>
+                  <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px">
+                    <input type="radio" name="tg-dm" value="pairing"> Pairing
+                  </label>
+                  <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px">
+                    <input type="radio" name="tg-dm" value="closed"> Closed
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap">
+            <button class="btn btn-primary btn-sm" id="tg-save-btn">Salvar Telegram</button>
+            <button class="btn btn-ghost btn-sm" id="tg-test-btn">Testar conexão</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="/static/js/shared.js"></script>
+<script src="/static/js/channels.js"></script>
+</body>
+</html>

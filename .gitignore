@@ -47,3 +47,5 @@ Thumbs.db
 # Replit
 .cache/
 .local/
+graphify-out/cache/
+graphify-out/cost.json
